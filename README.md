@@ -23,3 +23,5 @@ Supported music players:
 ====
 
 - Last.fm
+- iTunes
+- Spotify
