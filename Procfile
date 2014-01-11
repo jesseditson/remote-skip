@@ -1,1 +1,1 @@
-web: heroku/index.js
+web: node heroku/index.js
