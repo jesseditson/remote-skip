@@ -13,10 +13,10 @@ First, install [ngrok](https://ngrok.com)
 
 Then, follow these steps.
 
-- Clone this repo
+- `git clone git@github.com:jesseditson/remote-skip.git`
 - `npm install`
 - `heroku create <yourappname>`
-- git push heroku
+- `git push heroku`
 - `./serve`
 
 Requests to `yourappname.herokuapp.com/skip?user=somename` will now trigger a popup on your local machine, and after approving or 15 seconds, the song will be skipped.
