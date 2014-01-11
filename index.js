@@ -5,8 +5,8 @@ var applescript = require("applescript");
 var exec = require('child_process').exec;
 var request = require('request')
 
-var port = process.argv[4] || process.env['PORT'] || 8888;
-var address = process.argv[2] || false;
+var port = process.env['PORT'] || 8888;
+var address = process.env['CLIENT_ADDRESS'] || process.argv[2] || false;
 
 process.on('uncaughtException',function(err){
   console.error("ERROR: uncaught exception",err);
@@ -46,11 +46,11 @@ http.createServer(function(request, response) {
   }
 }).listen(parseInt(port, 10));
 
-console.log("Skip server running at\n  => http://localhost:" + port + "/\nCTRL + C to shutdown");
+console.log("Skip server running at\n  => http://localhost:" + port + "/ using client address "+address+"\nCTRL + C to shutdown");
 
 // set up timer to ping the server with our IP
 exec('heroku apps:info',function(err,stdout,stderr){
-  var urlString = process.argv[3] || stdout.match(/Web URL: +(.+)/)[1]
+  var urlString = process.env['SERVER_ADDRESS'] || process.argv[3] || stdout.match(/Web URL: +(.+)/)[1]
   var timer = setInterval(function(){
       if(err || stderr) return console.error("ERROR getting app name:",err || stderr);
       var info = {};

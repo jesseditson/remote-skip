@@ -18,7 +18,7 @@ http.createServer(function(req, res) {
     } else {
       var ip = getClientIp(req);
     }
-    clients[ip] = true
+    clients[ip] = new Date().getTime();
     res.writeHead(200, {"Content-Type":"application/json"});
     res.write(JSON.stringify({response : "client ip recognized : " + ip}));
     res.end();
@@ -85,3 +85,12 @@ function getClientIp(req) {
   }
   return ipAddress;
 };
+
+var reaper = setInterval(function(){
+  Object.keys(clients).forEach(function(client){
+    if(new Date().getTime() - clients[client] > 30000){
+      // remove old clients
+      delete clients[client]
+    }
+  })
+},5000)
