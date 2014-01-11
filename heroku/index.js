@@ -12,45 +12,49 @@ http.createServer(function(req, res) {
   var uri = url.parse(req.url,true);
   var pathname = uri.pathname;
   var query = uri.query;
+  console.log(clients)
   if(/^\/?client-ping$/.test(pathname)){
-    clients[getClientIp(req)] = true
-    response.writeHead(200, {"Content-Type":"application/json"});
-    response.write(JSON.stringify({response : "client recognized."}));
-    response.end();
+    var ip = getClientIp(req);
+    clients[ip] = true
+    res.writeHead(200, {"Content-Type":"application/json"});
+    res.write(JSON.stringify({response : "client ip recognized : " + ip}));
+    res.end();
   } else if(/^\/?skip$/.test(pathname)){
     var ips = Object.keys(clients);
     async.map(ips,function(client,done){
+      var address = client + ":" + clientPort;
+      console.log("dispatching skip request to: ",address);
       request({
-        url : client + ":" + clientPort,
+        url : address,
         qs : query
       },function(err,res,body){
         try {
           var response = JSON.parse(body)
         } catch(e){
-          var response = {error : e}
+          var response = {error : "error parsing response : " + e.message}
         } finally {
           done(null,response);
         }
       })
     },function(err,responses){
       if(err){
-        response.writeHead(500, {"Content-Type": "text/plain"});
-        response.write("Error encountered:\n",err);
-        response.end();
+        res.writeHead(500, {"Content-Type": "text/plain"});
+        res.write("Error encountered:\n",err);
+        res.end();
       } else {
-        response.writeHead(200, {"Content-Type":"application/json"});
+        res.writeHead(200, {"Content-Type":"application/json"});
         var response = {};
         ips.forEach(function(ip,idx){
           response[ip] = responses[idx];
         })
-        response.write(JSON.stringify({responses : responses}));
-        response.end();
+        res.write(JSON.stringify({responses : response}));
+        res.end();
       }
     })
   } else {
-      response.writeHead(404, {"Content-Type": "text/plain"});
-      response.write("404 Not Found\n");
-      response.end();
+      res.writeHead(404, {"Content-Type": "text/plain"});
+      res.write("404 Not Found\n");
+      res.end();
   }
 }).listen(parseInt(port, 10));
 
@@ -64,7 +68,7 @@ process.on('uncaughtException',function(err){
 function getClientIp(req) {
   var ipAddress;
   // The request may be forwarded from local web server.
-  var forwardedIpsStr = req.header('x-forwarded-for'); 
+  var forwardedIpsStr = req.headers['x-forwarded-for'];
   if (forwardedIpsStr) {
     // 'x-forwarded-for' header may return multiple IP addresses in
     // the format: "client IP, proxy 1 IP, proxy 2 IP" so take the
