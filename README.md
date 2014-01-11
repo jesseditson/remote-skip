@@ -17,7 +17,9 @@ Then, follow these steps.
 - git push heroku
 - `./serve`
 
-Requests to `yourappname.herokuapp.com/skip` will now trigger a popup on your local machine, and after approving or 15 seconds, the song will be skipped.
+Requests to `yourappname.herokuapp.com/skip?user=somename` will now trigger a popup on your local machine, and after approving or 15 seconds, the song will be skipped.
+
+This is especially useful when coupled with the included hubot script - when installed, your coworkers can now skip songs that you put on. Of course this could be abused, so the script allows you to deny any reuest for 15 seconds.
 
 Supported music players:
 ====
