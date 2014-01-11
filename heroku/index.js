@@ -12,9 +12,12 @@ http.createServer(function(req, res) {
   var uri = url.parse(req.url,true);
   var pathname = uri.pathname;
   var query = uri.query;
-  console.log(clients)
   if(/^\/?client-ping$/.test(pathname)){
-    var ip = getClientIp(req);
+    if(query.address){
+      var ip = query.address;
+    } else {
+      var ip = getClientIp(req);
+    }
     clients[ip] = true
     res.writeHead(200, {"Content-Type":"application/json"});
     res.write(JSON.stringify({response : "client ip recognized : " + ip}));
@@ -22,7 +25,7 @@ http.createServer(function(req, res) {
   } else if(/^\/?skip$/.test(pathname)){
     var ips = Object.keys(clients);
     async.map(ips,function(client,done){
-      var address = client + ":" + clientPort;
+      var address = /:/.test(client) ? client : client + ":" + clientPort;
       console.log("dispatching skip request to: ",address);
       request({
         url : address,

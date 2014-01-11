@@ -5,7 +5,12 @@ var applescript = require("applescript");
 var exec = require('child_process').exec;
 var request = require('request')
 
-var port = process.argv[2] || process.env['PORT'] || 8888;
+var port = process.argv[4] || process.env['PORT'] || 8888;
+var address = process.argv[2] || false;
+
+process.on('uncaughtException',function(err){
+  console.error("ERROR: uncaught exception",err);
+});
 
 var skipSongScript = fs.readFileSync('./scripts/skipSong.oascript',"utf-8");
 
@@ -43,27 +48,25 @@ http.createServer(function(request, response) {
 
 console.log("Skip server running at\n  => http://localhost:" + port + "/\nCTRL + C to shutdown");
 
-process.on('uncaughtException',function(err){
-  console.error("ERROR: uncaught exception",err);
-})
-
 // set up timer to ping the server with our IP
 exec('heroku apps:info',function(err,stdout,stderr){
   var urlString = process.argv[3] || stdout.match(/Web URL: +(.+)/)[1]
   var timer = setInterval(function(){
       if(err || stderr) return console.error("ERROR getting app name:",err || stderr);
+      var info = {};
+      if(address) info.address = address;
       request({
-        url : urlString + "client-ping"
+        url : urlString + "client-ping",
+        qs : info
       },function(err,res,body){
         if(err) console.error("ERROR updating remote server",err)
         try {
           var response = JSON.parse(body)
         } catch(e){
-          var response = {error : e}
+          var response = {error : e.message}
         } finally {
           if(!response || response.error) console.error("ERROR error parsing client ping response: ",(response && response.error) || "Empty response.");
         }
       })
-    });
   },1000);
 });
