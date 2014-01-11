@@ -4,7 +4,6 @@ var request = require('request');
 var async = require('async');
 
 var port = process.env['PORT'] || process.argv[2] || 8899;
-var clientPort = process.env['CLIENT_PORT'] || process.argv[3] || 8888;
 
 var clients = {};
 
@@ -25,10 +24,9 @@ http.createServer(function(req, res) {
   } else if(/^\/?skip$/.test(pathname)){
     var ips = Object.keys(clients);
     async.map(ips,function(client,done){
-      var address = /:/.test(client) ? client : client + ":" + clientPort;
-      console.log("dispatching skip request to: ",address);
+      console.log("dispatching skip request to: ",client);
       request({
-        url : address,
+        url : client + '/' + pathname,
         qs : query
       },function(err,res,body){
         try {
