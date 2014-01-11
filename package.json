@@ -16,7 +16,7 @@
     "mac"
   ],
   "author": "Jesse Ditson <jesse.ditson@gmail.com>",
-  "license": "Public Domain",
+  "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/jesseditson/remote-skip/issues"
   },
@@ -24,6 +24,5 @@
     "applescript": "~0.2.1",
     "request": "~2.31.0",
     "async": "~0.2.9"
-  },
-  "bin" : { "remote-skip" : "./serve" }
+  }
 }
